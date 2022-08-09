@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 
 const { JWT_SECRET = 'some-secret-key' } = process.env;
@@ -6,28 +7,42 @@ const { JWT_SECRET = 'some-secret-key' } = process.env;
 module.exports.getUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
-      res.status(200).send(user);
+      res.status(200).send({
+        email: user.email,
+        name: user.name,
+      });
     })
     .catch((err) => {
 
     });
 };
 
-module.exports.createUser = (req, res, next) => User.create({
-  email: req.body.email,
-  password: req.body.password,
-  name: req.body.name,
-})
-  .then((user) => res.status(201).send(user))
-  .catch((err) => {
-    res.send(err);
-  });
+module.exports.createUser = (req, res, next) => {
+  bcrypt.hash(req.body.password, 10)
+    .then((hash) => User.create({
+      email: req.body.email,
+      password: hash,
+      name: req.body.name,
+    }))
+    .then((user) => res.status(201).send({
+      email: user.email,
+      name: user.name,
+    }))
+    .catch((err) => {
+
+    });
+};
 
 module.exports.updateUser = (req, res, next) => {
-  const { name, about } = req.body;
+  const { email, name } = req.body;
 
-  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
-    .then((user) => res.send(user))
+  User.findByIdAndUpdate(req.user._id, { email, name }, { new: true, runValidators: true })
+    .then((user) => {
+      res.send({
+        email: user.email,
+        name: user.name,
+      });
+    })
     .catch((err) => {
 
     });
