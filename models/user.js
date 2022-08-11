@@ -29,7 +29,7 @@ userSchema.statics.findUserByCredentials = function (email, password) {
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        return Promise.reject();
+        return Promise.reject(new Error(''));
       }
 
       return bcrypt.compare(password, user.password)
