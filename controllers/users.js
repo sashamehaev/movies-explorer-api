@@ -13,7 +13,7 @@ module.exports.getUser = (req, res, next) => {
       });
     })
     .catch((err) => {
-
+      next(err);
     });
 };
 
@@ -29,7 +29,7 @@ module.exports.createUser = (req, res, next) => {
       name: user.name,
     }))
     .catch((err) => {
-
+      next(err);
     });
 };
 
@@ -62,6 +62,6 @@ module.exports.login = (req, res, next) => {
       res.status(200).send({ token });
     })
     .catch((err) => {
-
+      next(err);
     });
 };
