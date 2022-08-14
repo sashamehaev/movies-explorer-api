@@ -1,15 +1,13 @@
 const Movie = require('../models/movie');
-const ValidationError = require('../errors/validation-err');
-const NotFoundError = require('../errors/validation-err');
-const ForbiddenError = require('../errors/validation-err');
 
-module.exports.getMovies = (req, res) => {
-  const owner = req.user._id;
-  Movie.find({ owner })
+module.exports.getMovies = (req, res, next) => {
+  Movie.find({})
     .then((movies) => {
       res.status(200).send(movies);
     })
-    .catch((err) => res.status(500).send({ message: err.message }));
+    .catch((err) => {
+      next(err);
+    });
 };
 
 module.exports.createMovie = (req, res, next) => {
@@ -31,11 +29,10 @@ module.exports.createMovie = (req, res, next) => {
     movieId,
     owner: req.user._id,
   })
-    .then((movie) => res.status(201).send(movie))
+    .then((movie) => {
+      res.send(movie);
+    })
     .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new ValidationError('Введены некорректные данные'));
-      }
       next(err);
     });
 };
@@ -44,11 +41,11 @@ module.exports.deleteMovie = (req, res, next) => {
   Movie.findById(req.params.movieId)
     .then((movie) => {
       if (!movie) {
-        throw new NotFoundError('Фильм не найден');
+        throw new Error('Фильм не найден');
       }
 
       if (String(movie.owner) !== req.user._id) {
-        throw new ForbiddenError('Можно удалять только свои фильмы');
+        throw new Error('Можно удалять только свои фильмы');
       }
     })
     .then(() => {
@@ -59,7 +56,7 @@ module.exports.deleteMovie = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new ValidationError('Введены некорректные данные'));
+        next(new Error('Введены некорректные данные'));
       }
       next(err);
     });
