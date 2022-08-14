@@ -24,6 +24,8 @@ app.use('/movies', require('./routes/movies'));
 
 app.use(errorLogger);
 
+/* eslint no-unused-vars: ["error", {"args": "none"}] */
+
 app.use((err, req, res, next) => {
   res.status(400).send({ message: err.message });
 });
