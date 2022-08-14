@@ -26,7 +26,7 @@ app.use(require('./routes/users'));
 app.use(require('./routes/movies'));
 
 app.use((req, res, next) => {
-  next(new NotFoundError('Страницы по такому адресу не существует'));
+  next(new NotFoundError('Страница не найдена'));
 });
 
 app.use(errorLogger);
