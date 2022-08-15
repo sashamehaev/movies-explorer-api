@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundError = require('./errors/not-found-err');
@@ -26,10 +28,12 @@ app.use(require('./routes/users'));
 app.use(require('./routes/movies'));
 
 app.use((req, res, next) => {
-  next(new NotFoundError('Страницы по такому адресу не существует'));
+  next(new NotFoundError('Страница не найдена'));
 });
 
 app.use(errorLogger);
+
+app.use(errors());
 
 /* eslint no-unused-vars: ["error", {"args": "none"}] */
 
