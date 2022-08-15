@@ -1,6 +1,8 @@
+require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const { errors } = require('celebrate');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundError = require('./errors/not-found-err');
@@ -30,6 +32,8 @@ app.use((req, res, next) => {
 });
 
 app.use(errorLogger);
+
+app.use(errors());
 
 /* eslint no-unused-vars: ["error", {"args": "none"}] */
 

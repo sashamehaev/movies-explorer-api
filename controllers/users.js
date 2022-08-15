@@ -41,8 +41,9 @@ module.exports.createUser = (req, res, next) => {
         next(new ValidationError('Введены некорректные данные'));
       } if (err.code === 11000) {
         next(new AuthError('Пользователь с таким email уже существует'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -59,8 +60,11 @@ module.exports.updateUser = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new ValidationError('Введены некорректные данные'));
+      } if (err.code === 11000) {
+        next(new AuthError('Пользователь с таким email уже существует'));
+      } else {
+        next(err);
       }
-      next(err);
     });
 };
 
@@ -78,6 +82,10 @@ module.exports.login = (req, res, next) => {
       res.status(200).send({ token });
     })
     .catch((err) => {
-      next(err);
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
+        next(new ValidationError('Введены некорректные данные'));
+      } else {
+        next(err);
+      }
     });
 };
