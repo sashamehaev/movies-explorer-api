@@ -4,6 +4,7 @@ const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
 const ValidationError = require('../errors/not-found-err');
 const AuthError = require('../errors/not-found-err');
+const DefaultError = require('../errors/default-err');
 
 const { JWT_SECRET = 'some-secret-key' } = process.env;
 
@@ -21,7 +22,7 @@ module.exports.getUser = (req, res, next) => {
       });
     })
     .catch((err) => {
-      next(err);
+      next(new DefaultError(err));
     });
 };
 
@@ -42,7 +43,7 @@ module.exports.createUser = (req, res, next) => {
       } if (err.code === 11000) {
         next(new AuthError('Пользователь с таким email уже существует'));
       } else {
-        next(err);
+        next(new DefaultError(err));
       }
     });
 };
@@ -63,7 +64,7 @@ module.exports.updateUser = (req, res, next) => {
       } if (err.code === 11000) {
         next(new AuthError('Пользователь с таким email уже существует'));
       } else {
-        next(err);
+        next(new DefaultError(err));
       }
     });
 };
@@ -85,7 +86,7 @@ module.exports.login = (req, res, next) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new ValidationError('Введены некорректные данные'));
       } else {
-        next(err);
+        next(new DefaultError(err));
       }
     });
 };

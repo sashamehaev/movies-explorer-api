@@ -38,7 +38,7 @@ app.use(errors());
 /* eslint no-unused-vars: ["error", {"args": "none"}] */
 
 app.use((err, req, res, next) => {
-  res.status(400).send({ message: err.message });
+  res.status(err.statusCode).send({ message: err.message });
 });
 
 app.listen(PORT, () => {
