@@ -2,8 +2,8 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/user');
 const NotFoundError = require('../errors/not-found-err');
-const ValidationError = require('../errors/not-found-err');
-const AuthError = require('../errors/not-found-err');
+const ValidationError = require('../errors/validation-err');
+const AuthError = require('../errors/auth-err');
 const DefaultError = require('../errors/default-err');
 
 const { JWT_SECRET = 'some-secret-key' } = process.env;
@@ -21,9 +21,7 @@ module.exports.getUser = (req, res, next) => {
         name: user.name,
       });
     })
-    .catch((err) => {
-      next(new DefaultError(err));
-    });
+    .catch(next);
 };
 
 module.exports.createUser = (req, res, next) => {
@@ -82,11 +80,5 @@ module.exports.login = (req, res, next) => {
 
       res.status(200).send({ token });
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError' || err.name === 'CastError') {
-        next(new ValidationError('Введены некорректные данные'));
-      } else {
-        next(new DefaultError(err));
-      }
-    });
+    .catch(next);
 };
