@@ -28,7 +28,7 @@ app.use(require('./routes/users'));
 app.use(require('./routes/movies'));
 
 app.use((req, res, next) => {
-  next(new NotFoundError('Страница не найдена'));
+  next(new NotFoundError('Страница по такому адресу не найдена'));
 });
 
 app.use(errorLogger);
@@ -38,7 +38,7 @@ app.use(errors());
 /* eslint no-unused-vars: ["error", {"args": "none"}] */
 
 app.use((err, req, res, next) => {
-  res.status(400).send({ message: err.message });
+  res.status(err.statusCode).send({ message: err.message });
 });
 
 app.listen(PORT, () => {
