@@ -9,6 +9,7 @@ const {
 const { urlValidator } = require('../utils/urlValidator');
 
 router.get('/movies', getMovies);
+
 router.post('/movies', celebrate({
   body: Joi.object().keys({
     country: Joi.string().required(),
@@ -24,6 +25,7 @@ router.post('/movies', celebrate({
     movieId: Joi.number().required(),
   }),
 }), createMovie);
+
 router.delete('/movies/:movieId', celebrate({
   params: Joi.object().keys({
     movieId: Joi.string().hex().length(24),
