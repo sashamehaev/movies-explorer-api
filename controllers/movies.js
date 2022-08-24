@@ -2,17 +2,15 @@ const Movie = require('../models/movie');
 const ValidationError = require('../errors/validation-err');
 const NotFoundError = require('../errors/not-found-err');
 const ForbiddenError = require('../errors/forbidden-err');
-const DefaultError = require('../errors/default-err');
 
 module.exports.getMovies = (req, res, next) => {
   const owner = req.user._id;
+
   Movie.find({ owner })
     .then((movies) => {
-      res.status(200).send(movies);
+      res.send(movies);
     })
-    .catch((err) => {
-      next(new DefaultError(err));
-    });
+    .catch(next);
 };
 
 module.exports.createMovie = (req, res, next) => {
@@ -20,6 +18,7 @@ module.exports.createMovie = (req, res, next) => {
     country, director, duration, year, description,
     image, trailerLink, nameRU, nameEN, thumbnail, movieId,
   } = req.body;
+
   Movie.create({
     country,
     director,
@@ -34,13 +33,13 @@ module.exports.createMovie = (req, res, next) => {
     movieId,
     owner: req.user._id,
   })
-    .then((movie) => res.status(201).send(movie))
+    .then((movie) => res.status(201).send({ data: movie }))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new ValidationError('Введены некорректные данные'));
-      } else {
-        next(new DefaultError(err));
+        return;
       }
+      next(err);
     });
 };
 
@@ -58,7 +57,7 @@ module.exports.deleteMovie = (req, res, next) => {
     .then(() => {
       Movie.findByIdAndRemove(req.params.movieId)
         .then((movie) => {
-          res.status(200).send(movie);
+          res.send({ data: movie });
         });
     })
     .catch(next);

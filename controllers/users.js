@@ -6,7 +6,7 @@ const ValidationError = require('../errors/validation-err');
 const AuthError = require('../errors/auth-err');
 const DefaultError = require('../errors/default-err');
 
-const { JWT_SECRET = 'some-secret-key' } = process.env;
+const { NODE_ENV, JWT_SECRET } = process.env;
 
 /* eslint no-unused-vars: ["error", {"args": "none"}] */
 
@@ -16,7 +16,7 @@ module.exports.getUser = (req, res, next) => {
       if (!user) {
         throw new NotFoundError('Пользователь не найден');
       }
-      res.status(200).send({
+      res.send({
         email: user.email,
         name: user.name,
       });
@@ -40,9 +40,8 @@ module.exports.createUser = (req, res, next) => {
         next(new ValidationError('Введены некорректные данные'));
       } if (err.code === 11000) {
         next(new AuthError('Пользователь с таким email уже существует'));
-      } else {
-        next(new DefaultError(err));
       }
+      next(err);
     });
 };
 
@@ -61,9 +60,8 @@ module.exports.updateUser = (req, res, next) => {
         next(new ValidationError('Введены некорректные данные'));
       } if (err.code === 11000) {
         next(new AuthError('Пользователь с таким email уже существует'));
-      } else {
-        next(new DefaultError(err));
       }
+      next(err);
     });
 };
 
@@ -74,11 +72,11 @@ module.exports.login = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        JWT_SECRET,
+        NODE_ENV === 'production' ? JWT_SECRET : 'some-secret-key',
         { expiresIn: '7d' },
       );
 
-      res.status(200).send({ token });
+      res.send({ token });
     })
     .catch(next);
 };
